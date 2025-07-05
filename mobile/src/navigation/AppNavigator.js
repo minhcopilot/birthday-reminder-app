@@ -10,12 +10,13 @@ import RegisterScreen from '../screens/auth/RegisterScreen';
 
 // Main App Screens
 import HomeScreen from '../screens/app/HomeScreen';
-import BirthdayListScreen from '../screens/app/BirthdayListScreen';
-import BirthdayDetailScreen from '../screens/app/BirthdayDetailScreen';
-import AddBirthdayScreen from '../screens/app/AddBirthdayScreen';
-import EditBirthdayScreen from '../screens/app/EditBirthdayScreen';
-import ProfileScreen from '../screens/app/ProfileScreen';
-import NotificationsScreen from '../screens/app/NotificationsScreen';
+import BirthdayListScreen from '../screens/birthdays/BirthdayListScreen';
+import BirthdayDetailScreen from '../screens/birthdays/BirthdayDetailScreen';
+import AddBirthdayScreen from '../screens/birthdays/AddBirthdayScreen';
+import EditBirthdayScreen from '../screens/birthdays/EditBirthdayScreen';
+import ProfileScreen from '../screens/profile/ProfileScreen';
+import SettingsScreen from '../screens/profile/SettingsScreen';
+import NotificationsScreen from '../screens/NotificationsScreen';
 import SplashScreen from '../screens/SplashScreen';
 
 const Stack = createNativeStackNavigator();
@@ -58,6 +59,24 @@ const BirthdayStackNavigator = () => {
         name="EditBirthday" 
         component={EditBirthdayScreen}
         options={{ title: 'Chỉnh sửa sinh nhật' }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+// Profile Stack Navigator
+const ProfileStackNavigator = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen 
+        name="ProfileMain" 
+        component={ProfileScreen} 
+        options={{ title: 'Cá nhân' }}
+      />
+      <Stack.Screen 
+        name="Settings" 
+        component={SettingsScreen}
+        options={{ title: 'Cài đặt' }}
       />
     </Stack.Navigator>
   );
@@ -111,10 +130,10 @@ const MainNavigator = () => {
       />
       <Tab.Screen 
         name="Profile" 
-        component={ProfileScreen} 
+        component={ProfileStackNavigator} 
         options={{ 
           title: 'Cá nhân',
-          headerShown: true
+          headerShown: false
         }}
       />
     </Tab.Navigator>
