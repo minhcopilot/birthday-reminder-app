@@ -3,6 +3,7 @@ const { Op } = require('sequelize');
 const sequelize = require('sequelize');
 const Birthday = require('../models/Birthday');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
 const { sendPushNotification, sendEmailNotification } = require('./notificationService');
 
 // Function to get upcoming birthdays for notifications
@@ -66,22 +67,41 @@ const sendBirthdayReminders = async () => {
       
       // Send push notification if FCM token exists
       if (user.fcmToken) {
-        await sendPushNotification(
-          user.fcmToken,
-          `Nhắc nhở sinh nhật: ${birthday.name}`,
-          `${birthday.name} sẽ có sinh nhật vào ngày ${formattedDate} (còn ${birthday.reminderDays} ngày nữa).`,
-          {
-            birthdayId: birthday.id.toString(),
-            type: 'birthday_reminder'
-          }
-        );
+        try {
+          await sendPushNotification(
+            user.fcmToken,
+            `Nhắc nhở sinh nhật: ${birthday.name}`,
+            `${birthday.name} sẽ có sinh nhật vào ngày ${formattedDate} (còn ${birthday.reminderDays} ngày nữa).`,
+            {
+              birthdayId: birthday.id.toString(),
+              type: 'birthday_reminder'
+            }
+          );
+          
+          // Log notification
+          await Notification.create({
+            userId: user.id,
+            birthdayId: birthday.id,
+            type: 'push',
+            status: 'sent'
+          });
+        } catch (error) {
+          console.error('Error sending push notification:', error);
+          await Notification.create({
+            userId: user.id,
+            birthdayId: birthday.id,
+            type: 'push',
+            status: 'failed'
+          });
+        }
       }
       
       // Send email notification to user
-      await sendEmailNotification(
-        user.email,
-        `Nhắc nhở sinh nhật: ${birthday.name}`,
-        `
+      try {
+        await sendEmailNotification(
+          user.email,
+          `Nhắc nhở sinh nhật: ${birthday.name}`,
+          `
         <h2>Nhắc nhở sinh nhật</h2>
         <p>Xin chào ${user.firstName},</p>
         <p><strong>${birthday.name}</strong> sẽ có sinh nhật vào ngày <strong>${formattedDate}</strong> (còn ${birthday.reminderDays} ngày nữa).</p>
@@ -93,7 +113,24 @@ const sendBirthdayReminders = async () => {
         ${birthday.notes ? `<p>Ghi chú: ${birthday.notes}</p>` : ''}
         <p>Đây là email tự động từ ứng dụng Birthday Reminder.</p>
         `
-      );
+        );
+        
+        // Log notification
+        await Notification.create({
+          userId: user.id,
+          birthdayId: birthday.id,
+          type: 'email',
+          status: 'sent'
+        });
+      } catch (error) {
+        console.error('Error sending email notification:', error);
+        await Notification.create({
+          userId: user.id,
+          birthdayId: birthday.id,
+          type: 'email',
+          status: 'failed'
+        });
+      }
       
       console.log(`Sent reminder for ${birthday.name}'s birthday to ${user.email}`);
     }
