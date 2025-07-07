@@ -1,7 +1,7 @@
 const Notification = require('../models/Notification');
 const User = require('../models/User');
 const Birthday = require('../models/Birthday');
-const { sendPushNotification, sendEmailNotification } = require('../services/notificationService');
+const { sendPushNotification, sendBrevoEmailNotification } = require('../services/notificationService');
 
 // Send a notification
 const sendNotification = async (req, res) => {
@@ -33,7 +33,7 @@ const sendNotification = async (req, res) => {
         { birthdayId: birthdayId.toString() }
       );
     } else if (type === 'email') {
-      notificationResult = await sendEmailNotification(
+      notificationResult = await sendBrevoEmailNotification(
         user.email,
         title,
         body

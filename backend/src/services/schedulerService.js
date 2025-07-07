@@ -4,7 +4,7 @@ const sequelize = require('sequelize');
 const Birthday = require('../models/Birthday');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
-const { sendPushNotification, sendEmailNotification } = require('./notificationService');
+const { sendPushNotification, sendBrevoEmailNotification } = require('./notificationService');
 
 // Function to get upcoming birthdays for notifications
 const getUpcomingBirthdays = async () => {
@@ -96,9 +96,9 @@ const sendBirthdayReminders = async () => {
         }
       }
       
-      // Send email notification to user
+      // Send email notification to user using Brevo
       try {
-        await sendEmailNotification(
+        await sendBrevoEmailNotification(
           user.email,
           `Nhắc nhở sinh nhật: ${birthday.name}`,
           `

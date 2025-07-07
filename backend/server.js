@@ -34,6 +34,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
+app.use('/', (req, res) => {
+  res.send('Hello World');
+});
 app.use('/api/auth', authRoutes);
 app.use('/api/birthdays', birthdayRoutes);
 app.use('/api/users', userRoutes);
@@ -62,7 +65,6 @@ const startServer = async () => {
     console.log('Database connected successfully');
     
     await sequelize.sync({ alter: true });
-    console.log('Database synced successfully');
     
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
