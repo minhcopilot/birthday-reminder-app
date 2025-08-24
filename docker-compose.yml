@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: birthday_reminder
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - birthday-network
+
+  # Backend API
+  backend:
+    build: ./backend
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=birthday_reminder
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - JWT_SECRET=your-super-secret-jwt-key-here
+      - PORT=3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    networks:
+      - birthday-network
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  # Nginx Reverse Proxy (optional)
+  nginx:
+    image: nginx:alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend
+    networks:
+      - birthday-network
+
+volumes:
+  postgres_data:
+
+networks:
+  birthday-network:
+    driver: bridge

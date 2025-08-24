@@ -5,6 +5,8 @@ const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const sequelize = require('./src/config/database');
+// Import models to set up associations
+require('./src/models');
 const authRoutes = require('./src/routes/auth');
 const birthdayRoutes = require('./src/routes/birthdays');
 const userRoutes = require('./src/routes/users');
@@ -32,6 +34,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
+app.use('/', (req, res) => {
+  res.send('Hello World');
+});
 app.use('/api/auth', authRoutes);
 app.use('/api/birthdays', birthdayRoutes);
 app.use('/api/users', userRoutes);
@@ -60,7 +65,6 @@ const startServer = async () => {
     console.log('Database connected successfully');
     
     await sequelize.sync({ alter: true });
-    console.log('Database synced successfully');
     
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
